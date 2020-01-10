@@ -1,0 +1,27 @@
+import /system/etc/init/init.safailnet.rc
+
+on boot
+    write /sys/class/thermal/thermal_message/sconfig 10
+
+service citsensor-hal-1-1  /vendor/bin/hw/vendor.xiaomi.hardware.citsensorservice@1.1-service
+    override
+    class late_start
+    user system
+    group system input wakelock
+
+service vendor.imsdatadaemon /vendor/bin/imsdatadaemon
+    override
+    class main
+    user radio
+    socket ims_datad stream 0660 system radio
+    group radio wifi inet vendor_qti_diag log
+    disabled
+
+on property:sys.boot_completed=1
+    start vendor.msm_irqbalance
+
+on property:init.svc.vendor.ipacm-diag=running
+    stop vendor.ipacm-diag
+
+on property:init.svc.vendor.cnss_diag=running
+    stop vendor.cnss_diag
